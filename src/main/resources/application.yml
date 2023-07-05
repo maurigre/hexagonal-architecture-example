@@ -1,0 +1,13 @@
+
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME:root}:${MONGO_PASSWORD:rootpassword}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/?authSource=${MONGO_AUTH_SOURCE:admin}&authMechanism=${MONGO_AUTH_MECHANISM:SCRAM-SHA-256}&uuidRepresentation=${MONGO_UUID_REPRESENTATION:STANDARD}
+      database: ${MONGO_SERVICE_DATABASE:hexagonal_db}
+      autoIndexCreation: ${MONGO_AUTO_INDEX_CREATION:false}
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+hexagonal:
+  client:
+    address:
+      url: ${HEXAGONAL_CLIENT_ADDRESS_URL:http://localhost:8082/addresses}
