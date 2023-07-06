@@ -5,6 +5,7 @@ import br.com.maurireis.hexagonal.adapters.in.controller.request.CustomerRequest
 import br.com.maurireis.hexagonal.adapters.in.controller.response.CustomerResponse;
 import br.com.maurireis.hexagonal.application.ports.in.FindCustomerByIdInputPort;
 import br.com.maurireis.hexagonal.application.ports.in.InsertCustomerInputPort;
+import br.com.maurireis.hexagonal.application.ports.in.UpdateCustomerInputPort;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class CustomerController {
 
     private final InsertCustomerInputPort insertCustomerInputPort;
     private final FindCustomerByIdInputPort findCustomerByIdInputPort;
+    private final UpdateCustomerInputPort updateCustomerInputPort;
     private final CustomerMapper customerMapper;
 
     @PostMapping
@@ -31,6 +33,15 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> findById(@PathVariable @Valid @NotBlank final String id) {
         final var customer = findCustomerByIdInputPort.find(id);
         final var customerResponse = customerMapper.toCustomerResponse(customer);
+        return ResponseEntity.ok(customerResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerResponse> update(@PathVariable @NotBlank final String id, @RequestBody @Valid CustomerRequest customerRequest) {
+        final var customer = customerMapper.toCustomer(customerRequest);
+        customer.setId(id);
+        final var  update = updateCustomerInputPort.update(customer, customerRequest.getZipCode());
+        final var customerResponse = customerMapper.toCustomerResponse(update);
         return ResponseEntity.ok(customerResponse);
     }
 
