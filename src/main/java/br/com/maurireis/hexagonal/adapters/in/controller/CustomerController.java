@@ -4,29 +4,36 @@ import br.com.maurireis.hexagonal.adapters.in.controller.mapper.CustomerMapper;
 import br.com.maurireis.hexagonal.adapters.in.controller.request.CustomerRequest;
 import br.com.maurireis.hexagonal.adapters.in.controller.response.CustomerResponse;
 import br.com.maurireis.hexagonal.application.ports.in.FindCustomerByIdInputPort;
-import br.com.maurireis.hexagonal.application.ports.in.InsertCustomerInputPort;
+import br.com.maurireis.hexagonal.application.ports.in.CreateCustomerInputPort;
 import br.com.maurireis.hexagonal.application.ports.in.UpdateCustomerInputPort;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
+@RequestMapping(CustomerController.PATH)
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/customers")
 public class CustomerController {
 
-    private final InsertCustomerInputPort insertCustomerInputPort;
+    static final String VERSION = "/v1";
+    static final String PATH = VERSION + "/customers";
+
+    private final CreateCustomerInputPort createCustomerInputPort;
     private final FindCustomerByIdInputPort findCustomerByIdInputPort;
     private final UpdateCustomerInputPort updateCustomerInputPort;
     private final CustomerMapper customerMapper;
 
     @PostMapping
-    public ResponseEntity<Void> insert(@RequestBody @Valid CustomerRequest customerRequest) {
+    public ResponseEntity<CustomerResponse> create(@RequestBody @Valid CustomerRequest customerRequest, UriComponentsBuilder uriComponentsBuilder) {
         final var customer = customerMapper.toCustomer(customerRequest);
-        insertCustomerInputPort.insert(customer, customerRequest.getZipCode());
-        return ResponseEntity.ok().build();
+        final var created = createCustomerInputPort.create(customer, customerRequest.getZipCode());
+        final var customerResponse = customerMapper.toCustomerResponse(created);
+        final var uriCustomer = uriComponentsBuilder.path(PATH + "/{id}").buildAndExpand(created.getId()).toUri();
+        return ResponseEntity.created(uriCustomer)
+                .body(customerResponse);
     }
 
     @GetMapping("/{id}")

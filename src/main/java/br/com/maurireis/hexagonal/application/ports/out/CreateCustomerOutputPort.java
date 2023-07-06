@@ -2,7 +2,7 @@ package br.com.maurireis.hexagonal.application.ports.out;
 
 import br.com.maurireis.hexagonal.application.core.domain.Customer;
 
-public interface InsertCustomerOutputPort {
+public interface CreateCustomerOutputPort {
 
-    void insert(Customer customer);
+    Customer create(Customer customer);
 }
