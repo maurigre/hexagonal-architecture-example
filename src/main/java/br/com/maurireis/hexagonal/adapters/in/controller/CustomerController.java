@@ -3,6 +3,7 @@ package br.com.maurireis.hexagonal.adapters.in.controller;
 import br.com.maurireis.hexagonal.adapters.in.controller.mapper.CustomerMapper;
 import br.com.maurireis.hexagonal.adapters.in.controller.request.CustomerRequest;
 import br.com.maurireis.hexagonal.adapters.in.controller.response.CustomerResponse;
+import br.com.maurireis.hexagonal.application.ports.in.DeleteCustomerByIdInputPort;
 import br.com.maurireis.hexagonal.application.ports.in.FindCustomerByIdInputPort;
 import br.com.maurireis.hexagonal.application.ports.in.CreateCustomerInputPort;
 import br.com.maurireis.hexagonal.application.ports.in.UpdateCustomerInputPort;
@@ -24,6 +25,7 @@ public class CustomerController {
     private final CreateCustomerInputPort createCustomerInputPort;
     private final FindCustomerByIdInputPort findCustomerByIdInputPort;
     private final UpdateCustomerInputPort updateCustomerInputPort;
+    private final DeleteCustomerByIdInputPort deleteCustomerByIdInputPort;
     private final CustomerMapper customerMapper;
 
     @PostMapping
@@ -50,6 +52,13 @@ public class CustomerController {
         final var  update = updateCustomerInputPort.update(customer, customerRequest.getZipCode());
         final var customerResponse = customerMapper.toCustomerResponse(update);
         return ResponseEntity.ok(customerResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final String id){
+        deleteCustomerByIdInputPort.delete(id);
+        return ResponseEntity.noContent()
+                .build();
     }
 
 }
